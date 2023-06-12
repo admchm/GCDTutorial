@@ -60,12 +60,13 @@ extension CollectionViewController {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "normal", for: indexPath) as! PhotoCell
         
         cell.display(image: nil)
-        downloadWithGlobalQueue(indexPath: indexPath)
+        // downloadWithGlobalQueue(at: indexPath)
+        downloadWithUrlSession(at: indexPath)
         
         return cell
     }
     
-    private func downloadWithGlobalQueue(indexPath: IndexPath) {
+    private func downloadWithGlobalQueue(at indexPath: IndexPath) {
         DispatchQueue.global(qos: .utility).async { [weak self] in
             guard let self = self else {
                 return
@@ -84,6 +85,24 @@ extension CollectionViewController {
                 }
             }
         }
+    }
+    
+    private func downloadWithUrlSession(at indexPath: IndexPath) {
+        URLSession.shared.dataTask(with: urls[indexPath.item]) { [weak self] data, response, error in
+            
+            guard let self = self,
+                  let data = data,
+                  let image = UIImage(data: data) else {
+                return
+            }
+            
+            DispatchQueue.main.async {
+                if let cell = self.collectionView.cellForItem(at: indexPath) as? PhotoCell {
+                    cell.display(image: image)
+                }
+            }
+            
+        }.resume()
     }
 }
 
