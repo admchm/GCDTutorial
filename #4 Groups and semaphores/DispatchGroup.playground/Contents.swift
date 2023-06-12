@@ -59,6 +59,7 @@ if group.wait(timeout: .now() + 12) == .timedOut {
 
 
 // additional example
+/*
 queue.dispatch(group: group) {
     // count is 1
     group.enter()
@@ -69,8 +70,8 @@ queue.dispatch(group: group) {
         // perform your work here,
         // count goes back to 1 once complete
     }
-    
 }
+*/
 
 PlaygroundPage.current.finishExecution()
 
