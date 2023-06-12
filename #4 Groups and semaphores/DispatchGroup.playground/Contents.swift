@@ -51,10 +51,27 @@ queue.async(group: group) {
     print("End job 2")
 }
 
-if group.wait(timeout: .now() + 5) == .timedOut {
+if group.wait(timeout: .now() + 12) == .timedOut {
     print("I got tired of waiting")
 } else {
     print("All the jobs have completed")
 }
 
+
+// additional example
+queue.dispatch(group: group) {
+    // count is 1
+    group.enter()
+    // count is 2
+    someAsyncMethod {
+        defer { group.leave() } // indicates that a block in group finished executing
+        
+        // perform your work here,
+        // count goes back to 1 once complete
+    }
+    
+}
+
 PlaygroundPage.current.finishExecution()
+
+
