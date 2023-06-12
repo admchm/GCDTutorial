@@ -87,6 +87,35 @@ extension CollectionViewController {
         }
     }
     
+    
+    
+    /*
+     // EXAMPLES FROM THE BOOK
+     let queue = DispatchQueue(label: "xyz")
+     queue.async {
+     print("The block of code ran!")
+     }
+     
+     // would work exactly like this piece of code:
+     
+     let queue = DispatchQueue(label: "xyz")
+     let workItem = DispatchWorkItem {
+     print("The block of code ran!")
+     }
+     queue.async(execute: workItem)
+     
+     // ...
+     
+     // BAD PRACTICES / poor man's dependencies
+     let queue = DispatchQueue(label: "xyz")
+     let backgroundWorkItem = DispatchWorkItem { }
+     let updateUIWorkItem = DispatchWorkItem { }
+     
+     backgroundWorkItem.notify(queue: DispatchQueue.main, execute: updateUIWorkItem)
+     queue.async(execute: backgroundWorkItem)
+     
+     */
+    
     private func downloadWithUrlSession(at indexPath: IndexPath) {
         URLSession.shared.dataTask(with: urls[indexPath.item]) { [weak self] data, response, error in
             
