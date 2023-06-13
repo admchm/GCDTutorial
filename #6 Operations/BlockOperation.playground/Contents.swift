@@ -28,3 +28,22 @@
 
 import Foundation
 
+let sentence = "Hello there, I'm Adam! This is a playground for showing how the BlockOperation works."
+let wordOperation = BlockOperation()
+
+for word in sentence.split(separator: " ") {
+    wordOperation.addExecutionBlock {
+        print(word)
+        sleep(2)
+    }
+}
+
+wordOperation.completionBlock = {
+    print("That's all folks!")
+}
+
+duration {
+    wordOperation.start()
+}
+
+
