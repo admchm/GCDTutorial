@@ -1,4 +1,4 @@
-/// Copyright (c) 2019 Razeware LLC
+/// Copyright (c) 2023 Razeware LLC
 /// 
 /// Permission is hereby granted, free of charge, to any person obtaining a copy
 /// of this software and associated documentation files (the "Software"), to deal
@@ -28,25 +28,31 @@
 
 import UIKit
 
-class TiltShiftTableViewController: UITableViewController {
-    private let context = CIContext()
+final class TiltShiftOperation: Operation {
+    private static let context = CIContext()
+    var outputImage: UIImage?
     
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 10
+    private let inputImage: UIImage
+    
+    init(image: UIImage) {
+        self.inputImage = image
+        super.init()
     }
     
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "normal", for: indexPath) as! PhotoCell
-        let image = UIImage(named: "\(indexPath.row).png")!
+    override func main() {
+        guard let filter = TiltShiftFilter(image: inputImage, radius: 3),
+              let output = filter.outputImage else {
+            print("Failed to generate tilt shift image")
+            return
+        }
         
-        print("Filtering")
+        let fromRect = CGRect(origin: .zero, size: inputImage.size)
+        guard let cgImage = TiltShiftOperation.context.createCGImage(output, from: fromRect) else {
+            print("No image generated")
+            return
+        }
         
-        let op = TiltShiftOperation(image: image)
-        op.start()
-        
-        cell.display(image: op.outputImage)
-        print("Done")
-        
-        return cell
+        outputImage = UIImage(cgImage: cgImage)
     }
 }
+
