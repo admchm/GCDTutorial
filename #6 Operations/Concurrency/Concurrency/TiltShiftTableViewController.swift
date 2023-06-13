@@ -29,17 +29,17 @@
 import UIKit
 
 class TiltShiftTableViewController: UITableViewController {
-  private let context = CIContext()
-
-  override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-    return 10
-  }
-
-  override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-    let cell = tableView.dequeueReusableCell(withIdentifier: "normal", for: indexPath) as! PhotoCell
-    cell.display(image: nil)
-
-
-    return cell
-  }
+    private let context = CIContext()
+    
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return 10
+    }
+    
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "normal", for: indexPath) as! PhotoCell
+        cell.display(image: nil)
+        
+        
+        return cell
+    }
 }
