@@ -29,10 +29,14 @@
 import UIKit
 
 final class PhotoCell: UITableViewCell {
-  @IBOutlet private var theImageView: UIImageView!
-
-  func display(image: UIImage?) {
-    theImageView.image = image
-  }
+    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
+    @IBOutlet private var theImageView: UIImageView!
+    
+    
+    
+    
+    func display(image: UIImage?) {
+        theImageView.image = image
+    }
 }
 
