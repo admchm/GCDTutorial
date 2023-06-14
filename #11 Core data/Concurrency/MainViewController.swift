@@ -30,128 +30,128 @@ import UIKit
 import CoreData
 
 final class MainViewController: UIViewController {
-  private let passActualObject = true
-
-  @IBOutlet private weak var textField: UITextField!
-  @IBOutlet private weak var progressView: UIProgressView!
-  @IBOutlet private weak var label: UILabel!
-
-  private let ws = CharacterSet.whitespacesAndNewlines
-  private let formatter = NumberFormatter()
-
-  var managedObjectContext: NSManagedObjectContext!
-
-  private func doItTheRightWay(note: Notification) {
-    guard let objectId = note.userInfo?["objectID"] as? NSManagedObjectID else {
-        return
-    }
-
-    managedObjectContext.perform {
-      guard let entity = self.managedObjectContext.object(with: objectId) as? Number else { return }
-
-      let display = entity.display
-
-      DispatchQueue.main.async {
-        self.label.isHidden = false
-        self.label.text = display
-      }
-    }
-  }
-
-  private func doItTheWrongWay(note: Notification) {
-    guard let entity = note.userInfo?["object"] as? Number else {
-      return
-    }
-
-    managedObjectContext.perform {
-      let display = entity.display
-
-      DispatchQueue.main.async {
-        self.label.isHidden = false
-        self.label.text = display
-      }
-    }
-  }
-
-  override func viewDidLoad() {
-    super.viewDidLoad()
-
-    self.formatter.numberStyle = .spellOut
-
-    let callback = passActualObject ? doItTheWrongWay : doItTheRightWay
-    Notification.Name.coreDataEntity.onPost(using: callback)
-  }
-
-  @IBAction private func onCreateTapped() {
-    guard let text = self.textField.text?.trimmingCharacters(in: self.ws),
-      text.count > 0,
-      let max = Int32(text),
-      max > 0 else {
-        let message = "Please enter a number between 1 and \(Int32.max)"
-        UIAlertController.ok(withMessage: message, presentingViewController: self)
-
-        return
-    }
-
-    self.progressView.progress = 0
-    self.progressView.isHidden = false
-
-    let childContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-    childContext.parent = managedObjectContext
-
-    childContext.perform { [weak self] in
-      guard let self = self else { return }
-
-      let deleteRequest = NSBatchDeleteRequest(fetchRequest: Number.fetchRequest())
-      _ = try? childContext.execute(deleteRequest)
-
-      for num in 1...max {
-        let entity = Number(context: childContext)
-        entity.value = num
-        entity.display = self.formatter.string(from: NSNumber(value: num))
-
-        DispatchQueue.main.async {
-          self.progressView.progress = Float(num) / Float(max)
+    private let passActualObject = true
+    
+    @IBOutlet private weak var textField: UITextField!
+    @IBOutlet private weak var progressView: UIProgressView!
+    @IBOutlet private weak var label: UILabel!
+    
+    private let ws = CharacterSet.whitespacesAndNewlines
+    private let formatter = NumberFormatter()
+    
+    var managedObjectContext: NSManagedObjectContext!
+    
+    private func doItTheRightWay(note: Notification) {
+        guard let objectId = note.userInfo?["objectID"] as? NSManagedObjectID else {
+            return
         }
-      }
-      
-      do {
-        try childContext.save()
-      } catch {
-        DispatchQueue.main.async {
-          UIAlertController.ok(withMessage: "Failed to save core data")
+        
+        managedObjectContext.perform {
+            guard let entity = self.managedObjectContext.object(with: objectId) as? Number else { return }
+            
+            let display = entity.display
+            
+            DispatchQueue.main.async {
+                self.label.isHidden = false
+                self.label.text = display
+            }
         }
-        return
-      }
-
-      DispatchQueue.main.async {
-        self.progressView.isHidden = true
-      }
-
-      let random = Int.random(in: 1...Int(max))
-
-      let fetchRequest: NSFetchRequest<Number> = Number.fetchRequest()
-      fetchRequest.predicate = NSPredicate(format: "%K == %d", #keyPath(Number.value), random)
-
-      guard let entities = try? childContext.fetch(fetchRequest),
-        let entity = entities.first else {
-          DispatchQueue.main.async {
-            UIAlertController.ok(withMessage: "Failed to retrieve core data object")
-          }
-
-          return
-      }
-
-      var userInfo: [String: Any] = [:]
-
-      if self.passActualObject {
-        userInfo["object"] = entity
-      } else {
-        userInfo["objectID"] = entity.objectID
-      }
-      
-      Notification.Name.coreDataEntity.post(userInfo: userInfo)
     }
-  }
+    
+    private func doItTheWrongWay(note: Notification) {
+        guard let entity = note.userInfo?["object"] as? Number else {
+            return
+        }
+        
+        managedObjectContext.perform {
+            let display = entity.display
+            
+            DispatchQueue.main.async {
+                self.label.isHidden = false
+                self.label.text = display
+            }
+        }
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        self.formatter.numberStyle = .spellOut
+        
+        let callback = passActualObject ? doItTheWrongWay : doItTheRightWay
+        Notification.Name.coreDataEntity.onPost(using: callback)
+    }
+    
+    @IBAction private func onCreateTapped() {
+        guard let text = self.textField.text?.trimmingCharacters(in: self.ws),
+              text.count > 0,
+              let max = Int32(text),
+              max > 0 else {
+            let message = "Please enter a number between 1 and \(Int32.max)"
+            UIAlertController.ok(withMessage: message, presentingViewController: self)
+            
+            return
+        }
+        
+        self.progressView.progress = 0
+        self.progressView.isHidden = false
+        
+        let childContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        childContext.parent = managedObjectContext
+        
+        childContext.perform { [weak self] in
+            guard let self = self else { return }
+            
+            let deleteRequest = NSBatchDeleteRequest(fetchRequest: Number.fetchRequest())
+            _ = try? childContext.execute(deleteRequest)
+            
+            for num in 1...max {
+                let entity = Number(context: childContext)
+                entity.value = num
+                entity.display = self.formatter.string(from: NSNumber(value: num))
+                
+                DispatchQueue.main.async {
+                    self.progressView.progress = Float(num) / Float(max)
+                }
+            }
+            
+            do {
+                try childContext.save()
+            } catch {
+                DispatchQueue.main.async {
+                    UIAlertController.ok(withMessage: "Failed to save core data")
+                }
+                return
+            }
+            
+            DispatchQueue.main.async {
+                self.progressView.isHidden = true
+            }
+            
+            let random = Int.random(in: 1...Int(max))
+            
+            let fetchRequest: NSFetchRequest<Number> = Number.fetchRequest()
+            fetchRequest.predicate = NSPredicate(format: "%K == %d", #keyPath(Number.value), random)
+            
+            guard let entities = try? childContext.fetch(fetchRequest),
+                  let entity = entities.first else {
+                DispatchQueue.main.async {
+                    UIAlertController.ok(withMessage: "Failed to retrieve core data object")
+                }
+                
+                return
+            }
+            
+            var userInfo: [String: Any] = [:]
+            
+            if self.passActualObject {
+                userInfo["object"] = entity
+            } else {
+                userInfo["objectID"] = entity.objectID
+            }
+            
+            Notification.Name.coreDataEntity.post(userInfo: userInfo)
+        }
+    }
 }
 
