@@ -32,8 +32,18 @@ final class PhotoCell: UITableViewCell {
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     @IBOutlet private var theImageView: UIImageView!
     
-    
-    
+    var isLoading: Bool {
+        get {
+            return activityIndicator.isAnimating
+        }
+        set {
+            if newValue {
+                activityIndicator.startAnimating()
+            } else {
+                activityIndicator.stopAnimating()
+            }
+        }
+    }
     
     func display(image: UIImage?) {
         theImageView.image = image
