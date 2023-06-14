@@ -28,56 +28,46 @@
 
 import UIKit
 
-final class TiltShiftOperation: Operation {
-    /// Callback which will be run *on the main thread*
-    /// when the operation completes.
-    var onImageProcessed: ((UIImage?) -> Void)?
-    
-    private static let context = CIContext()
-    
-    var outputImage: UIImage?
-    
-    private let inputImage: UIImage?
-    
-    init(image: UIImage? = nil) {
-        inputImage = image
-        super.init()
-    }
-    
-    override func main() {
-        let dependencyImage = dependencies
-            .compactMap { ($0 as? ImageDataProvider)?.image }
-            .first
-        
-        guard let inputImage = inputImage ?? dependencyImage else {
-            return
-        }
-        
-        guard let filter = TiltShiftFilter(image: inputImage, radius:3),
-              let output = filter.outputImage else {
-            print("Failed to generate tilt shift image")
-            return
-        }
-        
-        let fromRect = CGRect(origin: .zero, size: inputImage.size)
-        guard
-            let cgImage = TiltShiftOperation.context.createCGImage(output, from: fromRect),
-            let rendered = cgImage.rendered()
-        else {
-            print("No image generated")
-            return
-        }
-        
-        outputImage = UIImage(cgImage: rendered)
-        
-        if let onImageProcessed = onImageProcessed {
-            DispatchQueue.main.async { [weak self] in
-                onImageProcessed(self?.outputImage)
-            }
-        }
-    }
-}
+typealias ImageOperationCompletion = ((Data?, URLResponse?, Error?) -> Void)?
 
-extension TiltShiftOperation: ImageDataProvider {
-    var image: UIImage? { return outputImage }
+final class NetworkImageOperation: AsyncOperation {
+  var image: UIImage?
+
+  private let url: URL
+  private let completion: ImageOperationCompletion
+
+  init(
+    url: URL,
+    completion: ImageOperationCompletion = nil) {
+
+    self.url = url
+    self.completion = completion
+
+    super.init()
+  }
+
+  convenience init?(
+    string: String,
+    completion: ImageOperationCompletion = nil) {
+
+    guard let url = URL(string: string) else { return nil }
+    self.init(url: url, completion: completion)
+  }
+
+  override func main() {
+    URLSession.shared.dataTask(with: url) { [weak self] data, response, error in
+      guard let self = self else { return }
+
+      defer { self.state = .finished }
+
+      if let completion = self.completion {
+        completion(data, response, error)
+        return
+      }
+
+      guard error == nil, let data = data else { return }
+
+      self.image = UIImage(data: data)
+    }.resume()
+  }
 }

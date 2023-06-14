@@ -28,12 +28,51 @@
 
 import Foundation
 
+extension AsyncOperation {
+    enum State: String {
+        case ready, executing, finished
+        
+        fileprivate var keyPath: String {
+            return "is\(rawValue.capitalized)"
+        }
+    }
+}
+
 class AsyncOperation: Operation {
     // Create state management
+    var state = State.ready {
+        willSet {
+            willChangeValue(forKey: newValue.keyPath)
+            willChangeValue(forKey: state.keyPath)
+        }
+        didSet {
+            didChangeValue(forKey: oldValue.keyPath)
+            didChangeValue(forKey: state.keyPath)
+        }
+    }
     
     // Override properties
+    override var isReady: Bool {
+        return super.isReady && state == .ready
+    }
+    
+    override var isExecuting: Bool {
+        return state == .executing
+    }
+    
+    override var isFinished: Bool {
+        return state == .finished
+    }
+    
+    override var isAsynchronous: Bool {
+        return true
+    }
     
     // Override start
+    override func start() {
+        main()
+        state = .executing
+    }
 }
 
 /*:
@@ -80,4 +119,3 @@ pairs.forEach { pair in
 
 //: This prevents the playground from finishing prematurely.  Never do this on a main UI thread!
 queue.waitUntilAllOperationsAreFinished()
-

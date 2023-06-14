@@ -30,7 +30,5 @@ import Foundation
 import UIKit
 
 protocol ImageDataProvider {
-  var image: UIImage? { get }
-  
-  
+    var image: UIImage? { get }
 }
