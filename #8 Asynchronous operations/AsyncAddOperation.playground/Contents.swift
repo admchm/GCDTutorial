@@ -29,11 +29,11 @@
 import Foundation
 
 class AsyncOperation: Operation {
-  // Create state management
-  
-  // Override properties
-  
-  // Override start
+    // Create state management
+    
+    // Override properties
+    
+    // Override start
 }
 
 /*:
@@ -44,24 +44,24 @@ class AsyncOperation: Operation {
  Notice that `self.state` is being set to `.finished`. What would happen if you left this line out?
  */
 class AsyncSumOperation: AsyncOperation {
-  let rhs: Int
-  let lhs: Int
-  var result: Int?
-  
-  init(lhs: Int, rhs: Int) {
-    self.lhs = lhs
-    self.rhs = rhs
+    let rhs: Int
+    let lhs: Int
+    var result: Int?
     
-    super.init()
-  }
-  
-  override func main() {
-    DispatchQueue.global().async {
-      Thread.sleep(forTimeInterval: 2)
-      self.result = self.lhs + self.rhs
-      self.state = .finished
+    init(lhs: Int, rhs: Int) {
+        self.lhs = lhs
+        self.rhs = rhs
+        
+        super.init()
     }
-  }
+    
+    override func main() {
+        DispatchQueue.global().async {
+            Thread.sleep(forTimeInterval: 2)
+            self.result = self.lhs + self.rhs
+            self.state = .finished
+        }
+    }
 }
 
 //: Now that you've got an `AsyncOperation` base class and a `AsyncSumOperation` subclass, run it through a small test.
@@ -69,13 +69,13 @@ let queue = OperationQueue()
 let pairs = [(2, 3), (5, 3), (1, 7), (12, 34), (99, 99)]
 
 pairs.forEach { pair in
-  let op = AsyncSumOperation(lhs: pair.0, rhs: pair.1)
-  op.completionBlock = {
-    guard let result = op.result else { return }
-    print("\(pair.0) + \(pair.1) = \(result)")
-  }
-  
-  queue.addOperation(op)
+    let op = AsyncSumOperation(lhs: pair.0, rhs: pair.1)
+    op.completionBlock = {
+        guard let result = op.result else { return }
+        print("\(pair.0) + \(pair.1) = \(result)")
+    }
+    
+    queue.addOperation(op)
 }
 
 //: This prevents the playground from finishing prematurely.  Never do this on a main UI thread!
