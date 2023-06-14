@@ -29,24 +29,24 @@
 import UIKit
 
 final class MainViewController: UIViewController {
-  var counter = 0
-
-  override func viewDidLoad() {
-    super.viewDidLoad()
-
-    let queue = DispatchQueue(label: "q")
-    queue.async {
-      for _ in 1 ... 10000 {
-        Thread.sleep(forTimeInterval: 0.1)
-        self.counter += 1
-      }
+    var counter = 0
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        let queue = DispatchQueue(label: "q")
+        queue.async {
+            for _ in 1 ... 10000 {
+                Thread.sleep(forTimeInterval: 0.1)
+                self.counter += 1
+            }
+        }
+        
+        DispatchQueue.main.async {
+            for _ in 1 ... 10000 {
+                self.counter += 1
+            }
+        }
     }
-
-    DispatchQueue.main.async {
-      for _ in 1 ... 10000 {
-        self.counter += 1
-      }
-    }
-  }
 }
 
