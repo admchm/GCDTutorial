@@ -17,4 +17,6 @@ This repository consists of a set of small projects that I finished during readi
 - 10 - Cancelling Operations ([link](https://github.com/admchm/GCDTutorial/tree/main/%2310%20Canceling%20operations/Concurrency))
 - 11 - Core Data ([link](https://github.com/admchm/GCDTutorial/tree/main/%2311%20Core%20data/Concurrency))
 - 12 - Thread Sanitizer ([link](https://github.com/admchm/GCDTutorial/tree/main/%2312%20Thread%20sanitizer/Concurrency))
-- 13 - Conclusion
+
+Testing on my own (outside of scope of the book):
+- 13 - GCD and async/await ([link](https://github.com/admchm/GCDTutorial/tree/main/%2313%20GCD%20and%20Async:Await%20test/GCDAndAsyncAwait))
