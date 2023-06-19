@@ -17,5 +17,7 @@ class AsyncAwaitTestController: UIViewController {
         super.viewWillAppear(animated)
         view.backgroundColor = .systemBackground
         navigationController?.navigationBar.isHidden = false
+        
+        presentAlertOnMainThread(title: "async/await", message: "After dismissing this alert, we will proceed to fetching images, using async/await.", buttonTitle: "Dismiss")
     }
 }

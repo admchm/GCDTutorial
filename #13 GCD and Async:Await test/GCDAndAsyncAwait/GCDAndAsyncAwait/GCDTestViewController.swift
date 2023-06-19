@@ -17,5 +17,7 @@ class GCDTestViewController: UIViewController {
         super.viewWillAppear(animated)
         view.backgroundColor = .systemBackground
         navigationController?.navigationBar.isHidden = false
+        
+        presentAlertOnMainThread(title: "GCD", message: "After dismissing this alert, we will proceed to fetching images, using Grand Central Dispatch.", buttonTitle: "Dismiss")
     }
 }
